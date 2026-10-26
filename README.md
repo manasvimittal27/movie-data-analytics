@@ -31,7 +31,7 @@ The dataset is **not included in this repository**; see [Installation](#installa
 
 ## Tech stack
 
-Python · pandas · NumPy · SciPy · Matplotlib · seaborn · Jupyter · pytest
+Python · pandas · NumPy · SciPy · Matplotlib · seaborn · PostgreSQL (SQL) · Jupyter · pytest
 
 ## Methodology
 
@@ -50,6 +50,11 @@ Python · pandas · NumPy · SciPy · Matplotlib · seaborn · Jupyter · pytest
 - **Metric relationships:** Pearson (raw and log-scaled) and **Spearman** correlations, plus median popularity by release year.
 - **Decade trends:** genre shares with per-decade denominators; the incomplete 2020s are flagged.
 - **Discovery shortlist:** a **vote-weighted (Bayesian-style) rating**, `v/(v+m)·R + m/(v+m)·C` with m = 555 and C = 6.56, tested against a stricter prior; a transparent "hidden gems" rule; a **within-genre comparison** of English and non-English titles.
+
+**SQL version** ([`sql/`](sql/README.md))
+
+- The cleaned tables are loaded into PostgreSQL with primary keys, a foreign key and CHECK constraints, and every analysis is reproduced in SQL: CTEs, window functions (`RANK`, `LAG`, `COUNT(*) OVER`), `PERCENTILE_CONT`, conditional aggregation with `FILTER`, and Spearman correlation computed from window ranks.
+- Every SQL result matches the pandas result in the notebook.
 
 ## Key findings
 
@@ -87,8 +92,13 @@ movie-data-analytics/
 │   └── README.md               # how to obtain mymoviedb.csv (data itself not committed)
 ├── notebooks/
 │   └── movie_data_analysis.ipynb   # the full analytical report, with outputs
+├── sql/
+│   ├── README.md               # how to run, schema, results
+│   ├── 00_setup.sql            # tables, constraints, load, rated_movies view
+│   └── 01-07_*.sql             # data checks and the five analyses in SQL
 ├── src/
-│   └── data_analysis.py        # cleaning pipeline, metrics, chart style
+│   ├── data_analysis.py        # cleaning pipeline, metrics, chart style
+│   └── export_tables.py        # writes the cleaned tables for PostgreSQL
 ├── tests/
 │   └── test_data_analysis.py   # unit tests for cleaning and metrics
 ├── reports/
@@ -109,6 +119,13 @@ pip install -r requirements.txt
 1. Download `mymoviedb.csv` from the [Kaggle dataset page](https://www.kaggle.com/datasets/disham993/9000-movies-dataset) and save it as `data/raw/mymoviedb.csv`. (Or set the `MOVIE_DATA_PATH` environment variable to wherever the file is.)
 2. Run the tests: `pytest`
 3. Open the notebook with `jupyter lab notebooks/movie_data_analysis.ipynb`, then **Run → Restart Kernel and Run All Cells**. Charts are written to `images/`.
+4. Optional, SQL version (needs PostgreSQL):
+   ```bash
+   python -m src.export_tables
+   createdb -U postgres movies
+   psql -U postgres -d movies -f sql/00_setup.sql
+   psql -U postgres -d movies -f sql/02_genre_performance.sql
+   ```
 
 ## Limitations and future improvements
 

@@ -1,6 +1,7 @@
 # Data: download separately (see data/README.md); redistribution rights not verified
 data/raw/*
 !data/raw/.gitkeep
+data/processed/
 
 # Python
 __pycache__/
