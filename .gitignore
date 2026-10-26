@@ -1,0 +1,19 @@
+# Data: download separately (see data/README.md); redistribution rights not verified
+data/raw/*
+!data/raw/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environments and editors
+.venv/
+venv/
+.env
+.vscode/
+.idea/
+.DS_Store
